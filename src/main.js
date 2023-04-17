@@ -4,10 +4,12 @@ import 'element-ui/lib/theme-chalk/index.css';
 import App from './App.vue';
 import router from "@/router";
 import './assets/gloable.css'
-Vue.use(ElementUI);
+
+Vue.config.productionTip = false
+Vue.use(ElementUI, { size: "mini" });
 
 new Vue({
   router,
-  el: '#app',
   render: h => h(App)
-});
+}).$mount('#app')
+
