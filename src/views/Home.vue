@@ -170,7 +170,8 @@
 import request from "@/utils/request";
 
 export default {
-    name: 'HomeView',
+    // eslint-disable-next-line vue/multi-word-component-names
+    name: 'Home',
     data() {
         return {
             tableData: [],
