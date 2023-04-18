@@ -8,8 +8,10 @@ import './assets/gloable.css'
 Vue.config.productionTip = false
 Vue.use(ElementUI, { size: "mini" });
 
+import store from './store/store'
+
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')
-
