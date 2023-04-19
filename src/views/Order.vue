@@ -131,7 +131,6 @@ export default {
                 // 注意data
                 this.tableData = res.data.records
                 this.total = res.data.total
-
             })
         },
         save() {
