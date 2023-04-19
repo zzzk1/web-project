@@ -9,7 +9,9 @@ Vue.config.productionTip = false
 Vue.use(ElementUI, { size: "mini" });
 
 import store from './store/store'
+import axios from 'axios';
 
+axios.defaults.withCredentials=true;
 new Vue({
   router,
   store,

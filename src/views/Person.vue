@@ -37,7 +37,7 @@ export default {
         }
     },
     created() {
-        request.get("/user/username/" + this.user.username).then(res => {
+        request.get("/user/username/" + this.user.token).then(res => {
             if (res.code == '200') {
                 this.form = res.data
             }
