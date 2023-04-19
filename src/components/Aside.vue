@@ -26,13 +26,17 @@
                 <i class="el-icon-s-custom"></i>
                 <span slot="title">用户管理</span>
             </el-menu-item>
+            <el-menu-item index="/order">
+                <i class="el-icon-s-custom"></i>
+                <span slot="title">订单管理</span>
+            </el-menu-item>
             <el-menu-item index="/role">
                 <i class="el-icon-s-custom"></i>
                 <span slot="title">角色管理</span>
             </el-menu-item>
-            <el-menu-item index="/order">
+            <el-menu-item index="/menu">
                 <i class="el-icon-s-custom"></i>
-                <span slot="title">订单管理</span>
+                <span slot="title">菜单管理</span>
             </el-menu-item>
         </el-submenu>
     </el-menu>

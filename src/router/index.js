@@ -13,7 +13,8 @@ const routes = [
       { path: 'user', name: '用户管理', component: () => import('../views/User.vue')},
       { path: 'person', name: '个人信息', component: () => import('../views/Person.vue')},
       { path: 'order', name: '订单管理', component: () => import('../views/Order.vue')},
-      { path: 'role', name: '订单管理', component: () => import('../views/Role.vue')},
+      { path: 'role', name: '角色管理', component: () => import('../views/Role.vue')},
+      { path: 'menu', name: '菜单管理', component: () => import('../views/Menu.vue')},
     ]
   },
   // {
