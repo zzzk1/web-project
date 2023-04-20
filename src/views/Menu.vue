@@ -26,18 +26,19 @@
                     <el-button type="primary">导出 <i class="el-icon-top"></i></el-button>
                 </div>
 
-                <el-table :data="tableData" border stripe :header-cell-class-name="headerBg"  @selection-change="handleSelectionChange">
+                <el-table :data="tableData" border stripe :header-cell-class-name="headerBg"
+                          row-key = "id" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55"></el-table-column>
                     <el-table-column prop="id" label="ID" width="80"></el-table-column>
                     <el-table-column prop="name" label="菜单名" width="140"></el-table-column>
                     <el-table-column prop="path" label="路径"></el-table-column>
                     <el-table-column prop="icon" label="图标"></el-table-column>
                     <el-table-column prop="description" label="描述"></el-table-column>
-                    <el-table-column prop="pid" label="父id"></el-table-column>
                     <el-table-column prop="pagePath" label="父项"></el-table-column>
                     <el-table-column prop="sortNum" label="排序"></el-table-column>
-                    <el-table-column label="操作"  width="200" align="center">
+                    <el-table-column label="操作"  width="300" align="center">
                         <template slot-scope="scope">
+                            <el-button type="primary" @click="handleAdd(scope.row.id)" v-if="!scope.row.pid && !scope.row.path">新增子菜单 <i class="el-icon-plus"></i></el-button>
                             <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
                             <el-popconfirm
                                     class="ml-5"
@@ -53,17 +54,6 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <div style="padding: 10px 0">
-                    <el-pagination
-                            @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                            :current-page="pageNum"
-                            :page-sizes="[2, 5, 10, 20]"
-                            :page-size="pageSize"
-                            layout="total, sizes, prev, pager, next, jumper"
-                            :total="total">
-                    </el-pagination>
-                </div>
 
                 <el-dialog title="菜单信息" :visible.sync="dialogFormVisible" width="30%" >
                     <el-form label-width="80px" size="small">
@@ -82,9 +72,6 @@
                         <el-form-item label="父id">
                             <el-input v-model="form.pid" autocomplete="off"></el-input>
                         </el-form-item>
-                        <el-form-item label="父项">
-                            <el-input v-model="form.pagePath" autocomplete="off"></el-input>
-                        </el-form-item>
                         <el-form-item label="排序">
                             <el-input v-model="form.sortNum" autocomplete="off"></el-input>
                         </el-form-item>
@@ -94,7 +81,6 @@
                         <el-button type="primary" @click="save">确 定</el-button>
                     </div>
                 </el-dialog>
-
 
             </el-main>
 
@@ -112,15 +98,13 @@ export default {
         return {
             tableData: [],
             total: 0,
-            pageNum: 1,
-            pageSize: 10,
             name: "",
             code: 0,
             message: "ok",
-            records: [],
+
             form: {},
             dialogFormVisible: false,
-            multipleSelection: []
+            multipleSelection: [],
         }
     },
     created() {
@@ -128,16 +112,13 @@ export default {
     },
     methods: {
         load() {
-            request.get("/menu/page", {
+            request.get("/menu", {
                 params: {
-                    pageNum: this.pageNum,
-                    pageSize: this.pageSize,
                     name: this.name,
                 }
             }).then(res => {
                 // 注意data
-                this.tableData = res.data.records
-                this.total = res.data.total
+                this.tableData = res.data
             })
         },
         save() {
@@ -172,9 +153,13 @@ export default {
                 }
             })
         },
-        handleAdd() {
+        // eslint-disable-next-line no-unused-vars
+        handleAdd(pid) {
             this.dialogFormVisible = true
             this.form = {}
+            if (pid) {
+                this.form.pid = pid;
+            }
         },
         handleEdit(row) {
             this.form = row
@@ -197,7 +182,7 @@ export default {
             console.log(pageNum)
             this.pageNum = pageNum
             this.load()
-        }
+        },
     }
 }
 </script>

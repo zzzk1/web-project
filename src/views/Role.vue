@@ -34,6 +34,8 @@
                     <el-table-column prop="flag" label="标识"></el-table-column>
                     <el-table-column label="操作"  width="200" align="center">
                         <template slot-scope="scope">
+                            <el-button type="info" @click="selectMenu(scope.row.id)">分配菜单 <i class="el-icon-menu"></i></el-button>
+
                             <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
                             <el-popconfirm
                                     class="ml-5"
@@ -61,7 +63,7 @@
                     </el-pagination>
                 </div>
 
-                <el-dialog title="订单信息" :visible.sync="dialogFormVisible" width="30%" >
+                <el-dialog title="角色信息" :visible.sync="dialogFormVisible" width="30%" >
                     <el-form label-width="80px" size="small">
                         <el-form-item label="角色">
                             <el-input v-model="form.name" autocomplete="off"></el-input>
@@ -79,7 +81,21 @@
                     </div>
                 </el-dialog>
 
-
+                <el-dialog title="菜单分配" :visible.sync="menuDialogVis" width="30%" >
+                    <el-tree
+                        :props="props"
+                        :data="menuData"
+                        show-checkbox
+                        node-key="id"
+                        :default-expanded-keys="[1, 4]"
+                        :default-checked-keys="[4]"
+                        @check-change="handleCheckChange">
+                    </el-tree>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="menuDialogVis = false">取 消</el-button>
+                        <el-button type="primary" @click="save">确 定</el-button>
+                    </div>
+                </el-dialog>
             </el-main>
 
         </el-container>
@@ -89,6 +105,7 @@
 <script>
 
 import request from "@/utils/request";
+// import {re} from "@babel/core/lib/vendor/import-meta-resolve";
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: "User",
@@ -103,8 +120,13 @@ export default {
             message: "ok",
             records: [],
             form: {},
+            multipleSelection: [],
             dialogFormVisible: false,
-            multipleSelection: []
+            menuDialogVis: false,
+            menuData: [],
+            props: {
+                label: "name",
+            }
         }
     },
     created() {
@@ -181,7 +203,20 @@ export default {
             console.log(pageNum)
             this.pageNum = pageNum
             this.load()
-        }
+        },
+        // eslint-disable-next-line no-unused-vars
+        selectMenu(roleId) {
+            this.menuDialogVis = true
+            // 请求菜单数据
+            request.get("/menu", {
+            }).then(res => {
+
+                this.menuData = res.data
+            })
+        },
+        handleCheckChange(data, checked, indeterminate) {
+            console.log(data, checked, indeterminate);
+        },
     }
 }
 </script>
