@@ -23,6 +23,7 @@
 
 <script>
 import request from "@/utils/request";
+import {setRoutes} from "@/router";
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: "Login",
@@ -54,12 +55,15 @@ export default {
                         return false
                     }
                     request.post("/user/register", this.user).then(res => {
-                        if(!res  || res.code !== '200') {
-                            this.$message.error(res.message)
-                        } else {
-                            this.$message.success("注册成功")
-                            localStorage.setItem("user", JSON.stringify(res))
+                        if(res.code == '200') {
+                            localStorage.setItem("user", JSON.stringify(res.data))
+                            localStorage.setItem("menus", JSON.stringify(res.data.menus))
+                            // 动态设置路由
+                            setRoutes();
                             this.$router.push("/")
+
+                        } else {
+                            this.$message.error("注册失败")
                         }
                     })
                 }
