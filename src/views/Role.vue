@@ -32,7 +32,7 @@
                     <el-table-column prop="name" label="用户名" width="140"></el-table-column>
                     <el-table-column prop="description" label="描述"></el-table-column>
                     <el-table-column prop="flag" label="标识"></el-table-column>
-                    <el-table-column label="操作"  width="200" align="center">
+                    <el-table-column label="操作"  width="300" align="center">
                         <template slot-scope="scope">
                             <el-button type="info" @click="selectMenu(scope.row.id)">分配菜单 <i class="el-icon-menu"></i></el-button>
 
@@ -83,17 +83,22 @@
 
                 <el-dialog title="菜单分配" :visible.sync="menuDialogVis" width="30%" >
                     <el-tree
+                        ref="tree"
                         :props="props"
                         :data="menuData"
                         show-checkbox
                         node-key="id"
-                        :default-expanded-keys="[1, 4]"
-                        :default-checked-keys="[4]"
+                        :default-expanded-keys="expends"
+                        :default-checked-keys="checks"
                         @check-change="handleCheckChange">
+                        <!-- eslint-disable-next-line -->
+                        <span class="custom-tree-node" slot-scope="{ node, data }">
+                        <span><i :class="data.icon"></i> {{ data.name }}</span>
+                        </span>
                     </el-tree>
                     <div slot="footer" class="dialog-footer">
                         <el-button @click="menuDialogVis = false">取 消</el-button>
-                        <el-button type="primary" @click="save">确 定</el-button>
+                        <el-button type="primary" @click="saveRoleMenu">确 定</el-button>
                     </div>
                 </el-dialog>
             </el-main>
@@ -126,7 +131,10 @@ export default {
             menuData: [],
             props: {
                 label: "name",
-            }
+            },
+            expends: [],
+            checks: [],
+            roleId: 2
         }
     },
     created() {
@@ -155,6 +163,16 @@ export default {
                 } else {
                     this.$message.error("保存失败")
                 }
+            })
+        },
+        saveRoleMenu() {
+            request.post("/role/roleMenu/" + this.roleId, this.$refs.tree.getCheckedKeys()).then(res => {
+               if (res.code  == "200") {
+                   this.$message.success("绑定成功")
+                   this.menuDialogVis = false;
+               } else {
+                   this.$message.error(res.message);
+               }
             })
         },
         del(id) {
@@ -207,15 +225,20 @@ export default {
         // eslint-disable-next-line no-unused-vars
         selectMenu(roleId) {
             this.menuDialogVis = true
+            this.roleId = roleId;
             // 请求菜单数据
             request.get("/menu", {
             }).then(res => {
-
                 this.menuData = res.data
+
+                //后台返回的菜单数据处理成ID数组
+                this.expends = this.menuData.map(v => v.id)
             })
-        },
-        handleCheckChange(data, checked, indeterminate) {
-            console.log(data, checked, indeterminate);
+            request.get("/role/roleMenu/" + roleId, {
+            }).then(res => {
+                this.checks = res.data
+
+            })
         },
     }
 }

@@ -32,10 +32,12 @@
                     <el-table-column prop="id" label="ID" width="80"></el-table-column>
                     <el-table-column prop="name" label="菜单名" width="140"></el-table-column>
                     <el-table-column prop="path" label="路径"></el-table-column>
-                    <el-table-column prop="icon" label="图标"></el-table-column>
+                    <el-table-column prop="icon" label="图标" class-name="fontSize18" align="center" label-class-name="fontSize12">
+                        <template slot-scope="scope">
+                            <i :class="scope.row.icon"></i>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="description" label="描述"></el-table-column>
-                    <el-table-column prop="pagePath" label="父项"></el-table-column>
-                    <el-table-column prop="sortNum" label="排序"></el-table-column>
                     <el-table-column label="操作"  width="300" align="center">
                         <template slot-scope="scope">
                             <el-button type="primary" @click="handleAdd(scope.row.id)" v-if="!scope.row.pid && !scope.row.path">新增子菜单 <i class="el-icon-plus"></i></el-button>
@@ -64,16 +66,17 @@
                             <el-input v-model="form.path" autocomplete="off"></el-input>
                         </el-form-item>
                         <el-form-item label="图标">
-                            <el-input v-model="form.icon" autocomplete="off"></el-input>
+                            <!-- eslint-disable-next-line -->
+                            <template slot-scope="scope">
+                                <el-select clearable v-model="form.icon" placeholder="请选择" style="width: 80%">
+                                    <el-option v-for="item in options" :key="item.name" :label="item.name" :value="item.value">
+                                        <i :class="item.value"/> {{item.name}}
+                                    </el-option>
+                                </el-select>
+                            </template>
                         </el-form-item>
                         <el-form-item label="描述">
                             <el-input v-model="form.description" autocomplete="off"></el-input>
-                        </el-form-item>
-                        <el-form-item label="父id">
-                            <el-input v-model="form.pid" autocomplete="off"></el-input>
-                        </el-form-item>
-                        <el-form-item label="排序">
-                            <el-input v-model="form.sortNum" autocomplete="off"></el-input>
                         </el-form-item>
                     </el-form>
                     <div slot="footer" class="dialog-footer">
@@ -91,6 +94,7 @@
 <script>
 
 import request from "@/utils/request";
+
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: "User",
@@ -101,10 +105,10 @@ export default {
             name: "",
             code: 0,
             message: "ok",
-
             form: {},
             dialogFormVisible: false,
             multipleSelection: [],
+            options: []
         }
     },
     created() {
@@ -162,8 +166,13 @@ export default {
             }
         },
         handleEdit(row) {
-            this.form = row
+            this.form = row //diff p21
             this.dialogFormVisible = true
+            // 请求图标和数据
+            request.get("/menu/icons", {
+            }).then(res => {
+                this.options = res.data
+            })
         },
         handleSelectionChange(val) {
             console.log(val)
@@ -187,9 +196,14 @@ export default {
 }
 </script>
 
-
 <style>
 .headerBg {
     background: #eee!important;
+}
+.fontSize18{
+    font-size: 18px;
+}
+.fontSize12{
+    font-size: 12px;
 }
 </style>
