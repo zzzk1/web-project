@@ -10,7 +10,7 @@
                 </div>
 
                 <div style="margin: 10px 0">
-                    <el-button type="primary" @click="handleAdd">新增 <i class="el-icon-circle-plus-outline"></i></el-button>
+                    <el-button type="primary" @click="Add">新增 <i class="el-icon-circle-plus-outline"></i></el-button>
                     <el-popconfirm
                             class="ml-5"
                             confirm-button-text='确定'
@@ -32,6 +32,7 @@
                     <el-table-column prop="id" label="ID" width="80"></el-table-column>
                     <el-table-column prop="name" label="菜单名" width="140"></el-table-column>
                     <el-table-column prop="path" label="路径"></el-table-column>
+                    <el-table-column prop="pagePath" label="页面路径"></el-table-column>
                     <el-table-column prop="icon" label="图标" class-name="fontSize18" align="center" label-class-name="fontSize12">
                         <template slot-scope="scope">
                             <i :class="scope.row.icon"></i>
@@ -65,6 +66,9 @@
                         <el-form-item label="路径">
                             <el-input v-model="form.path" autocomplete="off"></el-input>
                         </el-form-item>
+                        <el-form-item label="页面路径">
+                            <el-input v-model="form.pagePath" autocomplete="off"></el-input>
+                        </el-form-item>
                         <el-form-item label="图标">
                             <!-- eslint-disable-next-line -->
                             <template slot-scope="scope">
@@ -97,14 +101,14 @@ import request from "@/utils/request";
 
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
-    name: "User",
+    name: "Menu",
     data() {
         return {
             tableData: [],
             total: 0,
             name: "",
-            code: 0,
-            message: "ok",
+            pageNum: 1,
+            pageSize: 10,
             form: {},
             dialogFormVisible: false,
             multipleSelection: [],
@@ -127,7 +131,7 @@ export default {
         },
         save() {
             request.post("/menu", this.form).then(res => {
-                if (res.data) {
+                if (res.code == "200") {
                     this.$message.success("保存成功")
                     this.dialogFormVisible = false
                     this.load()
@@ -162,11 +166,16 @@ export default {
             this.dialogFormVisible = true
             this.form = {}
             if (pid) {
-                this.form.pid = pid;
+                this.form.pid = pid
             }
         },
+        Add() {
+            this.dialogFormVisible = true
+            this.form = {}
+            this.form.pid = 0;
+        },
         handleEdit(row) {
-            this.form = row //diff p21
+            this.form = JSON.parse(JSON.stringify(row))
             this.dialogFormVisible = true
             // 请求图标和数据
             request.get("/menu/icons", {

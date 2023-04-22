@@ -32,7 +32,7 @@ export default {
     name: "Header",
     props: {
         collapseBtnClass: String,
-        collapse: Boolean,
+        collapse: '',
     },
     computed: {
         currentPathName () {
@@ -52,8 +52,10 @@ export default {
           this.$emit("asideCollapse")
         },
         logout() {
-            this.$router.push("/login")
-            localStorage.removeItem("user")
+            this.$store.commit("logout")
+
+            // this.$router.push("/login")
+            // localStorage.removeItem("user")
             this.$message.success("退出成功")
         }
     }
