@@ -30,6 +30,7 @@
                     <el-table-column type="selection" width="55"></el-table-column>
                     <el-table-column prop="id" label="ID" width="80"></el-table-column>
                     <el-table-column prop="username" label="用户名" width="140"></el-table-column>
+                    <el-table-column prop="role" label="角色"></el-table-column>
                     <el-table-column prop="nickname" label="昵称" width="120"></el-table-column>
                     <el-table-column prop="email" label="邮箱"></el-table-column>
                     <el-table-column prop="phone" label="电话"></el-table-column>
@@ -67,6 +68,16 @@
                     <el-form label-width="80px" size="small">
                         <el-form-item label="用户名">
                             <el-input v-model="form.username" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="角色">
+                            <el-select v-model="form.role" placeholder="请选择角色">
+                                <el-option
+                                    v-for="item in roles"
+                                    :key="item.name"
+                                    :label="item.name"
+                                    :value="item.flag">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item label="昵称">
                             <el-input v-model="form.nickname" autocomplete="off"></el-input>
@@ -113,7 +124,8 @@ export default {
             records: [],
             form: {},
             dialogFormVisible: false,
-            multipleSelection: []
+            multipleSelection: [],
+            roles: []
         }
     },
     created() {
@@ -132,6 +144,15 @@ export default {
                 this.tableData = res.data.records
                 this.total = res.data.total
 
+            })
+            request.get("/role", {
+                params: {
+                    pageNum: this.pageNum,
+                    pageSize: this.pageSize,
+                    username: this.username,
+                }
+            }).then(res => {
+                this.roles = res.data
             })
         },
         save() {

@@ -20,6 +20,7 @@
 <script>
 
 import request from "@/utils/request";
+import {setRoutes} from "@/router";
 
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
@@ -46,10 +47,14 @@ export default {
                     request.post("/user/login", this.user).then(res => {
                         if(res.code == '200') {
                             localStorage.setItem("user", JSON.stringify(res.data))
+                            localStorage.setItem("menus", JSON.stringify(res.data.menus))
+                            // 动态设置路由
+                            setRoutes();
                             this.$router.push("/")
+                            this.$message.success(res.message)
 
                         } else {
-                            this.$message.error("用户名或密码错误")
+                            this.$message.error(res.message)
                         }
                     })
                 } else {

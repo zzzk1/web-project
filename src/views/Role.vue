@@ -34,7 +34,7 @@
                     <el-table-column prop="flag" label="标识"></el-table-column>
                     <el-table-column label="操作"  width="300" align="center">
                         <template slot-scope="scope">
-                            <el-button type="info" @click="selectMenu(scope.row.id)">分配菜单 <i class="el-icon-menu"></i></el-button>
+                            <el-button type="info" @click="selectMenu(scope.row)">分配菜单 <i class="el-icon-menu"></i></el-button>
 
                             <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
                             <el-popconfirm
@@ -134,7 +134,8 @@ export default {
             },
             expends: [],
             checks: [],
-            roleId: 2
+            roleId: 0,
+            roleFlag: ''
         }
     },
     created() {
@@ -167,12 +168,15 @@ export default {
         },
         saveRoleMenu() {
             request.post("/role/roleMenu/" + this.roleId, this.$refs.tree.getCheckedKeys()).then(res => {
-               if (res.code  == "200") {
-                   this.$message.success("绑定成功")
-                   this.menuDialogVis = false;
-               } else {
-                   this.$message.error(res.message);
-               }
+                if (res.code  == "200") {
+                    this.$message.success("绑定成功")
+                    this.menuDialogVis = false;
+                    if (this.roleFlag === "ADMIN") {
+                        this.$store.commit("logout")
+                    }
+                } else {
+                    this.$message.error(res.message);
+                }
             })
         },
         del(id) {
@@ -223,9 +227,10 @@ export default {
             this.load()
         },
         // eslint-disable-next-line no-unused-vars
-        selectMenu(roleId) {
+        selectMenu(role) {
             this.menuDialogVis = true
-            this.roleId = roleId;
+            this.roleId = role.id;
+            this.roleFlag = role.flag;
             // 请求菜单数据
             request.get("/menu", {
             }).then(res => {
@@ -234,10 +239,20 @@ export default {
                 //后台返回的菜单数据处理成ID数组
                 this.expends = this.menuData.map(v => v.id)
             })
-            request.get("/role/roleMenu/" + roleId, {
+            request.get("/role/roleMenu/" + this.roleId, {
             }).then(res => {
                 this.checks = res.data
 
+                request.get("/menu/ids").then(r => {
+                    const ids = r.data
+                    ids.forEach(id => {
+                        if (!this.checks.includes(id)) {
+                            this.$refs.tree.setChecked(id, false)
+                        }
+                    })
+
+                    this.menuDialogVis = true;
+                })
             })
         },
     }

@@ -7,7 +7,7 @@
 
         <el-container>
             <el-header style="border-bottom: 1px solid #ccc;">
-                <Header :collapseBtnClass="collapseBtnClass" :collapse="isCollapse" />
+                <Header :collapseBtnClass="collapseBtnClass" :collapse="collapse" :menus="user.menus"/>
             </el-header>
 
             <el-main>
@@ -23,6 +23,7 @@
 
 import Aside from "@/components/Aside";
 import Header from "@/components/Header.vue";
+import {request} from "axios";
 
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
@@ -33,11 +34,15 @@ export default {
             isCollapse: false,
             sideWidth: 200,
             logoTextShow: true,
+            user: {}
         }
     },
     components: {
         Aside,
         Header
+    },
+    created() {
+        this.getUser()
     },
     methods: {
         collapse() {  // 点击收缩按钮触发
@@ -50,6 +55,14 @@ export default {
                 this.sideWidth = 200
                 this.collapseBtnClass = 'el-icon-s-fold'
                 this.logoTextShow = true
+            }
+        },
+        getUser() {
+            let username = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).username: ""
+            if (username) {
+                request.get("/user/username/" + username).then(res => {
+                    this.user = res.data
+                })
             }
         }
     }
