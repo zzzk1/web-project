@@ -4,15 +4,13 @@
         <el-container>
             <el-main>
                 <div style="margin: 10px 0">
-                    <el-input style="width: 200px" placeholder="请输入名称" suffix-icon="el-icon-search" v-model="username"></el-input>
-                    <el-input style="width: 200px" placeholder="请输入邮箱" suffix-icon="el-icon-message" class="ml-5" v-model="email"></el-input>
-                    <el-input style="width: 200px" placeholder="请输入地址" suffix-icon="el-icon-position" class="ml-5" v-model="address"></el-input>
+                    <el-input style="width: 200px" placeholder="请输入用户名" suffix-icon="el-icon-search" v-model="name"></el-input>
                     <el-button class="ml-5" type="primary" @click="load">搜索</el-button>
                     <el-button type="warning" @click="reset">重置</el-button>
                 </div>
 
                 <div style="margin: 10px 0">
-                    <el-button type="primary" @click="handleAdd">新增 <i class="el-icon-circle-plus-outline"></i></el-button>
+                    <el-button type="primary" @click="Add">新增 <i class="el-icon-circle-plus-outline"></i></el-button>
                     <el-popconfirm
                             class="ml-5"
                             confirm-button-text='确定'
@@ -28,16 +26,22 @@
                     <el-button type="primary">导出 <i class="el-icon-top"></i></el-button>
                 </div>
 
-                <el-table :data="tableData" border stripe :header-cell-class-name="headerBg"  @selection-change="handleSelectionChange">
+                <el-table :data="tableData" border stripe :header-cell-class-name="headerBg"
+                          row-key = "id" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55"></el-table-column>
                     <el-table-column prop="id" label="ID" width="80"></el-table-column>
-                    <el-table-column prop="username" label="用户名" width="140"></el-table-column>
-                    <el-table-column prop="nickname" label="昵称" width="120"></el-table-column>
-                    <el-table-column prop="email" label="邮箱"></el-table-column>
-                    <el-table-column prop="phone" label="电话"></el-table-column>
-                    <el-table-column prop="address" label="地址"></el-table-column>
-                    <el-table-column label="操作"  width="200" align="center">
+                    <el-table-column prop="name" label="菜单名" width="140"></el-table-column>
+                    <el-table-column prop="path" label="路径"></el-table-column>
+                    <el-table-column prop="pagePath" label="页面路径"></el-table-column>
+                    <el-table-column prop="icon" label="图标" class-name="fontSize18" align="center" label-class-name="fontSize12">
                         <template slot-scope="scope">
+                            <i :class="scope.row.icon"></i>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="description" label="描述"></el-table-column>
+                    <el-table-column label="操作"  width="300" align="center">
+                        <template slot-scope="scope">
+                            <el-button type="primary" @click="handleAdd(scope.row.id)" v-if="!scope.row.pid && !scope.row.path">新增子菜单 <i class="el-icon-plus"></i></el-button>
                             <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
                             <el-popconfirm
                                     class="ml-5"
@@ -53,34 +57,30 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <div style="padding: 10px 0">
-                    <el-pagination
-                            @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                            :current-page="pageNum"
-                            :page-sizes="[2, 5, 10, 20]"
-                            :page-size="pageSize"
-                            layout="total, sizes, prev, pager, next, jumper"
-                            :total="total">
-                    </el-pagination>
-                </div>
 
-                <el-dialog title="用户信息" :visible.sync="dialogFormVisible" width="30%" >
+                <el-dialog title="菜单信息" :visible.sync="dialogFormVisible" width="30%" >
                     <el-form label-width="80px" size="small">
-                        <el-form-item label="用户名">
-                            <el-input v-model="form.username" autocomplete="off"></el-input>
+                        <el-form-item label="菜单名">
+                            <el-input v-model="form.name" autocomplete="off"></el-input>
                         </el-form-item>
-                        <el-form-item label="昵称">
-                            <el-input v-model="form.nickname" autocomplete="off"></el-input>
+                        <el-form-item label="路径">
+                            <el-input v-model="form.path" autocomplete="off"></el-input>
                         </el-form-item>
-                        <el-form-item label="邮箱">
-                            <el-input v-model="form.email" autocomplete="off"></el-input>
+                        <el-form-item label="页面路径">
+                            <el-input v-model="form.pagePath" autocomplete="off"></el-input>
                         </el-form-item>
-                        <el-form-item label="电话">
-                            <el-input v-model="form.phone" autocomplete="off"></el-input>
+                        <el-form-item label="图标">
+                            <!-- eslint-disable-next-line -->
+                            <template slot-scope="scope">
+                                <el-select clearable v-model="form.icon" placeholder="请选择" style="width: 80%">
+                                    <el-option v-for="item in options" :key="item.name" :label="item.name" :value="item.value">
+                                        <i :class="item.value"/> {{item.name}}
+                                    </el-option>
+                                </el-select>
+                            </template>
                         </el-form-item>
-                        <el-form-item label="地址">
-                            <el-input v-model="form.address" autocomplete="off"></el-input>
+                        <el-form-item label="描述">
+                            <el-input v-model="form.description" autocomplete="off"></el-input>
                         </el-form-item>
                     </el-form>
                     <div slot="footer" class="dialog-footer">
@@ -88,7 +88,6 @@
                         <el-button type="primary" @click="save">确 定</el-button>
                     </div>
                 </el-dialog>
-
 
             </el-main>
 
@@ -102,49 +101,37 @@ import request from "@/utils/request";
 
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
-    name: 'Home',
+    name: "Menu",
     data() {
         return {
             tableData: [],
             total: 0,
+            name: "",
             pageNum: 1,
-            pageSize: 5,
-            username: "",
-            email: "",
-            address: "",
+            pageSize: 10,
             form: {},
             dialogFormVisible: false,
             multipleSelection: [],
-            collapseBtnClass: 'el-icon-s-fold',
-            isCollapse: false,
-            sideWidth: 200,
-            logoTextShow: true,
-            headerBg: 'headerBg'
+            options: []
         }
     },
     created() {
-        // 请求分页查询数据
         this.load()
     },
     methods: {
         load() {
-            request.get("/user/page", {
+            request.get("/menu", {
                 params: {
-                    pageNum: this.pageNum,
-                    pageSize: this.pageSize,
-                    username: this.username,
-                    email: this.email,
-                    address: this.address,
+                    name: this.name,
                 }
             }).then(res => {
                 // 注意data
-                this.tableData = res.data.records
-                this.total = res.data.total
+                this.tableData = res.data
             })
         },
         save() {
-            request.post("/user", this.form).then(res => {
-                if (res.data) {
+            request.post("/menu", this.form).then(res => {
+                if (res.code == "200") {
                     this.$message.success("保存成功")
                     this.dialogFormVisible = false
                     this.load()
@@ -154,7 +141,7 @@ export default {
             })
         },
         del(id) {
-            request.delete("/user/" + id).then(res => {
+            request.delete("/menu/" + id).then(res => {
                 if (res.data) {
                     this.$message.success("删除成功")
                     this.load()
@@ -165,7 +152,7 @@ export default {
         },
         delBatch() {
             let ids = this.multipleSelection.map(v => v.id)  // [{}, {}, {}] => [1,2,3]
-            request.post("/user/del/batch", ids).then(res => {
+            request.post("/menu/del/batch", ids).then(res => {
                 if (res.data) {
                     this.$message.success("批量删除成功")
                     this.load()
@@ -174,22 +161,34 @@ export default {
                 }
             })
         },
-        handleAdd() {
+        // eslint-disable-next-line no-unused-vars
+        handleAdd(pid) {
             this.dialogFormVisible = true
             this.form = {}
+            if (pid) {
+                this.form.pid = pid
+            }
+        },
+        Add() {
+            this.dialogFormVisible = true
+            this.form = {}
+            this.form.pid = 0;
         },
         handleEdit(row) {
-            this.form = row
+            this.form = JSON.parse(JSON.stringify(row))
             this.dialogFormVisible = true
+            // 请求图标和数据
+            request.get("/menu/icons", {
+            }).then(res => {
+                this.options = res.data
+            })
         },
         handleSelectionChange(val) {
             console.log(val)
             this.multipleSelection = val
         },
         reset() {
-            this.username = ""
-            this.email = ""
-            this.address = ""
+            this.name = ""
             this.load()
         },
         handleSizeChange(pageSize) {
@@ -201,7 +200,7 @@ export default {
             console.log(pageNum)
             this.pageNum = pageNum
             this.load()
-        }
+        },
     }
 }
 </script>
@@ -209,5 +208,11 @@ export default {
 <style>
 .headerBg {
     background: #eee!important;
+}
+.fontSize18{
+    font-size: 18px;
+}
+.fontSize12{
+    font-size: 12px;
 }
 </style>
