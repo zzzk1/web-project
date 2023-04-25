@@ -42,36 +42,40 @@ export default {
         return {
             form: {},
             user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {}
-
         }
     },
     created() {
-        request.get("/user/username/" + this.user.token).then(res => {
-            if (res.code == '200') {
-                this.form = res.data
-            }
+        this.getUser().then(res => {
+            console.log(res)
+            this.form = res
         })
     },
     methods: {
         async getUser() {
-            return (await request.get("/user/username/" + this.user.token)).data
+            return (await request.get("/user/username/" + this.user.username)).data
         },
         save() {
             request.post("/user", this.form).then(res => {
-                if (res) {
+                if (res.code == '200') {
+                    this.$message.success("保存成功")
+
+                    // 触发父级更新User的方法
+                    this.$emit("refreshUser")
+
                     // 更新浏览器存储的用户信息
                     this.getUser().then(res => {
                         res.token = JSON.parse(localStorage.getItem("user")).token
                         localStorage.setItem("user", JSON.stringify(res))
                     })
-                    this.$message.success("保存成功")
+
                 } else {
                     this.$message.error("保存失败")
                 }
             })
         },
         handleAvatarSuccess(res) {
-            this.form.avatarUrl = res
+            console.log(res)
+            this.form.avatarUrl = res.data
         }
     }
 
