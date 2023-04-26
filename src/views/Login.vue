@@ -50,8 +50,12 @@ export default {
                             localStorage.setItem("menus", JSON.stringify(res.data.menus))
                             // 动态设置路由
                             setRoutes();
-                            this.$router.push("/")
                             this.$message.success(res.message)
+                            if (res.data.role == "ADMIN") {
+                                this.$router.push("/")
+                            } else {
+                                this.$router.push("/front/home")
+                            }
 
                         } else {
                             this.$message.error(res.message)
