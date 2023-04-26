@@ -115,9 +115,11 @@ export default {
             })
         },
         changeEnable(row) {
-            request.post("/file/update", row).then(res => {
+            request.post("/file/upload", row).then(res => {
                 if (res.code == '200') {
                     this.$message.success("操作成功")
+                } else {
+                    this.$message.success("操作失败")
                 }
             })
         },
@@ -169,7 +171,12 @@ export default {
             window.open(url)
         },
         preview(url) {
-            window.open('https://file.keking.cn/onlinePreview?url=' + encodeURIComponent(window.btoa((url))))
+            let imgs = url.split(',').filter(i => !!i)
+            let a = window.open('')
+            imgs.forEach((item, index) => {
+                // window.open(item, `img${index}`) // 尝试失败
+                a.document.write(`<!DOCTYPE html><html><body ><img src='${item}'/></body></html>`)
+            })
         },
     }
 }
