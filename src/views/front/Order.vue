@@ -4,13 +4,13 @@
         <el-container>
             <el-main>
                 <div style="margin: 10px 0">
-                    <el-input style="width: 200px" placeholder="请输入用户名" suffix-icon="el-icon-search" v-model="username"></el-input>
+                    <el-input style="width: 200px" placeholder="请输入商品名" suffix-icon="el-icon-search" v-model="spuName"></el-input>
                     <el-button class="ml-5" type="primary" @click="load">搜索</el-button>
                     <el-button type="warning" @click="reset">重置</el-button>
                 </div>
 
                 <div style="margin: 10px 0">
-                    <el-button type="primary" @click="handleAdd">新增 <i class="el-icon-circle-plus-outline"></i></el-button>
+<!--                    <el-button type="primary" @click="handleAdd">新增 <i class="el-icon-circle-plus-outline"></i></el-button>-->
                     <el-popconfirm
                             class="ml-5"
                             confirm-button-text='确定'
@@ -28,15 +28,15 @@
 
                 <el-table :data="tableData" border stripe :header-cell-class-name="headerBg"  @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55"></el-table-column>
-                    <el-table-column prop="id" label="ID" width="80"></el-table-column>
-                    <el-table-column prop="username" label="用户名" width="140"></el-table-column>
-                    <el-table-column prop="address" label="地址"></el-table-column>
+                    <el-table-column prop="id" label="订单号" width="80"></el-table-column>
+                    <el-table-column prop="spuName" label="商品名" width="180"></el-table-column>
+                    <el-table-column prop="address" label="地址" width="180"></el-table-column>
                     <el-table-column prop="createTime" label="创建时间" :formatter="dateFormat"></el-table-column>
                     <el-table-column prop="amount" label="金额"></el-table-column>
                     <el-table-column prop="finish" label="交易已完成"></el-table-column>
-                    <el-table-column label="操作"  width="200" align="center">
+                    <el-table-column label="操作"  width="100" align="center">
                         <template slot-scope="scope">
-                            <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
+<!--                            <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>-->
                             <el-popconfirm
                                     class="ml-5"
                                     confirm-button-text='确定'
@@ -65,8 +65,8 @@
 
                 <el-dialog title="订单信息" :visible.sync="dialogFormVisible" width="30%" >
                     <el-form label-width="80px" size="small">
-                        <el-form-item label="用户名">
-                            <el-input v-model="form.username" autocomplete="off"></el-input>
+                        <el-form-item label="商品名">
+                            <el-input v-model="form.spuName" autocomplete="off" :formatter="dateFormat"></el-input>
                         </el-form-item>
                         <el-form-item label="地址">
                             <el-input v-model="form.address" autocomplete="off"></el-input>
@@ -107,25 +107,28 @@ export default {
             total: 0,
             pageNum: 1,
             pageSize: 10,
-            username: "",
+            spuName: "",
             code: 0,
             message: "ok",
             records: [],
             form: {},
             dialogFormVisible: false,
-            multipleSelection: []
+            multipleSelection: [],
         }
     },
     created() {
         this.load()
     },
     methods: {
+
         load() {
-            request.get("/order/page", {
+            let user =  localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")): {}
+            request.get("/order/front/page/" + user.username, {
                 params: {
                     pageNum: this.pageNum,
                     pageSize: this.pageSize,
-                    username: this.username,
+                    spuName: this.spuName,
+                    username: this.username
                 }
             }).then(res => {
                 // 注意data
@@ -178,9 +181,7 @@ export default {
             this.multipleSelection = val
         },
         reset() {
-            this.username = ""
-            this.email = ""
-            this.address = ""
+            this.spuName = ""
             this.load()
         },
         handleSizeChange(pageSize) {
